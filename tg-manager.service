@@ -1,0 +1,17 @@
+[Unit]
+Description=Telegram Manager & AI Analyzer Service
+After=network.target
+
+[Service]
+Type=simple
+User=server
+WorkingDirectory=/home/server/Projects/tg-manager
+ExecStart=/home/server/Projects/tg-manager/.venv/bin/python main.py
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
