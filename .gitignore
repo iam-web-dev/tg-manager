@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Telegram session files (Telethon/Pyrogram sessions - Contains Telegram auth credentials)
+*.session
+*.session-journal
+ai_manager_session*
+tg_session*
+
+# Database files (contains chat history, users, messages)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+tg_manager.db
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+bot.log
+logs/
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

@@ -1,0 +1,27 @@
+2. Eski bot processini top
+pgrep -af "python3 main.py"
+
+Masalan:
+
+676228 /bin/python3 main.py
+
+PID — 676228.
+
+3. Eski processni to‘xtat
+kill 676228
+
+Agar 2–3 soniyadan keyin ham ishlayotgan bo‘lsa:
+
+kill -9 676228
+
+Tekshir:
+
+pgrep -af "python3 main.py"
+
+Hech narsa chiqmasligi kerak.
+
+4. Yangilangan kodni ishga tushir
+nohup /bin/python3 main.py >> bot.log 2>&1 &
+5. Ishlaganini tekshir
+sleep 2
+tail -30 bot.log
