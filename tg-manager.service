@@ -9,6 +9,7 @@ WorkingDirectory=/home/server/Projects/tg-manager
 ExecStart=/home/server/Projects/tg-manager/.venv/bin/python main.py
 Restart=always
 RestartSec=5
+TimeoutStopSec=15s
 Environment=PYTHONUNBUFFERED=1
 StandardOutput=journal
 StandardError=journal

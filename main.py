@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import signal
 import sys
 from database import init_db, engine
 from collector import start_collector
@@ -23,6 +24,19 @@ async def main():
     await init_db()
     logger.info("Ma'lumotlar bazasi tayyor!")
 
+    loop = asyncio.get_running_loop()
+    stop_event = asyncio.Event()
+
+    def _signal_handler():
+        logger.info("To'xtatish signali (SIGINT/SIGTERM) qabul qilindi...")
+        stop_event.set()
+
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        try:
+            loop.add_signal_handler(sig, _signal_handler)
+        except (NotImplementedError, RuntimeError):
+            pass
+
     tasks = []
 
     # Telethon Collector ni ishga tushirish (Agar API_ID va API_HASH kiritilgan bo'lsa)
@@ -42,18 +56,22 @@ async def main():
         logger.error("Hech qaysi modul ishga tushmadi! .env faylni tekshiring.")
         return
 
+    stop_task = asyncio.create_task(stop_event.wait(), name="stop_listener")
+    all_tasks = tasks + [stop_task]
+
     try:
-        # Ikkala vazifani (task) birgalikda (concurrently) yuritish
-        await asyncio.gather(*tasks)
+        # Birorta task tugasa (masalan bot to'xtasa yoki stop signali kelsa), barchasini to'xtatamiz
+        done, pending = await asyncio.wait(all_tasks, return_when=asyncio.FIRST_COMPLETED)
+        logger.info("Barcha xizmatlarni to'xtatish boshlanmoqda...")
     except asyncio.CancelledError:
         logger.info("Asosiy tasklar bekor qilindi.")
     except Exception as e:
         logger.exception(f"Kutilmagan xatolik yuz berdi: {e}")
     finally:
-        for t in tasks:
+        for t in all_tasks:
             if not t.done():
                 t.cancel()
-        await asyncio.gather(*tasks, return_exceptions=True)
+        await asyncio.gather(*all_tasks, return_exceptions=True)
         await engine.dispose()
         logger.info("Ma'lumotlar bazasi va barcha xizmatlar toza yopildi.")
 
